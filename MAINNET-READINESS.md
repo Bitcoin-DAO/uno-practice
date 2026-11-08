@@ -29,7 +29,8 @@
 
 - [x] Balance, movements and funding address read through an unstable indexer, with the remembered reading shown (UNO practice, v0.1.4)
 - [ ] Second chain source used when the first fails. Not proven: Zelcore's Blockbook refuses reads from web pages (CORS), shown by v0.1.8 on 8 Nov 2026, so on 6 Nov mempool.space most likely did all the work. Works in the end-to-end tests against a mock
-- [ ] The DAO's own chain gateway as the first chain source (design: `docs/chain-gateway.md`; provider behind it now, own node optional later)
+- [x] The DAO's own chain gateway as the first chain source: v1 (public services read server-side) deployed, read the treasury and broadcast UNO's closing round while mempool.space was down (v0.1.9, 8 Nov 2026)
+- [ ] Gateway v2: own pruned node with a watch-only wallet behind the gateway, before mainnet (`docs/chain-gateway.md`)
 - [ ] Change returned by a round is shown and spent in the next round
 - [ ] Treasury read with many movements (10 or more)
 
@@ -51,7 +52,7 @@
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
 - [x] Lost key: card restore (@founder1) and key replacement without the card, remote, twice in a row, with member list versions 3 and 4 (@member1, now VNTH · SY98) (UNO practice, v0.1.7, 8 Nov 2026)
-- [~] Trial stages: a council member restores from the card and types the 12 words of the trial treasury key back in; same fingerprint (8c37eb1f) (UNO practice, v0.1.7, 8 Nov 2026). Still to do: sign a round with it
+- [x] Trial stages: a council member restores from the card, types the 12 words of the trial treasury key back in (same fingerprint, 8c37eb1f) and signs a round with it: closing round 2026-W45 (UNO practice, v0.1.7–v0.1.9, 8 Nov 2026)
 
 ## 5. Payout rounds
 
@@ -117,3 +118,5 @@ From UNO's practice run, 6 November 2026:
 23. Payout proposals: a **Share** button for the recipient's confirmation link, next to "Copy the confirmation link", like the founder code's Share. The message names the DAO, the proposal number and title, and the amount, then the link, so the recipient knows what they are confirming before opening it. Copy stays where sharing is not available.
 24. When the chain cannot be read, the error shows only the last failure ("/address/…: Failed to fetch"), so nobody can tell whether one source or all of them failed, or why. List each source with its own reason (done in v0.1.8). Also cut the load: several open pages each read the treasury every few minutes and every "Try again" starts a new reading of about 15 requests, which can get a public source to throttle the DAO. Share one reading between open pages, and wait before a manual retry.
 25. Zelcore's testnet4 Blockbook does not let web pages read its API (no CORS header), so the app can use it only as the manual broadcast page. With mempool.space down, UNO's closing round could not be prepared (8 Nov 2026). Before mainnet: our own indexer, served with CORS for the DAO's site, as the first source; any public source checked from a web page before it goes into a config. Consider a separate config entry for broadcast pages, so a source that cannot be read is not asked on every reading.
+26. Council page: a round that is signed and already on the network still shows "has its signatures: it can be broadcast", and counts in the to-do badge, until the receipt. Check the chain like the round page does: "On the network, waiting for confirmation", with no to-do. (Seen with UNO's closing round 2026-W45.)
+27. Broadcast results: the gateway knows which sources accepted a transaction and which refused, and why; show it on the round page. "On the network ✓" should say which sources have the transaction: in round 2026-W45 only one of mempool.space's servers had it, for hours, while no miner did. (Broadcast again while unconfirmed: done in v0.1.10.)

@@ -2,6 +2,17 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.1.10 · 8 November 2026
+
+Found in UNO's closing round: one of mempool.space's servers still reported the transaction while no miner had it, so the round page showed "On the network ✓" and offered no way to send it again.
+
+**Broadcast again while unconfirmed**
+- Until the round is confirmed, the round page keeps **Broadcast again** (sending twice is harmless), with a line saying when to use it.
+- The signed transaction to copy and each source's broadcast page stay available under **Send it by hand**.
+
+**Tests**
+- End-to-end payout round through the chain gateway.
+
 ## v0.1.9 · 8 November 2026
 
 Found in UNO's closing round: with mempool.space down, the app had no chain source it could read, although Zelcore's Blockbook was in sync throughout. It only refuses web pages.

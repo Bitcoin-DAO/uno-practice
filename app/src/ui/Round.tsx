@@ -268,20 +268,35 @@ export function RoundDetail({ id }: { id: string }) {
             <>
               <p class="ok">{t('rd.ready')}</p>
               {onChain ? (
-                <p class="small">{t('rd.broadcasted')}</p>
+                <>
+                  <p class="small">{t('rd.broadcasted')}</p>
+                  {/* A source may know the transaction without passing it to miners: let anyone send it again. */}
+                  <p class="small">{t('rd.stuck')}</p>
+                  <button type="button" class="btn secondary" disabled={busy} onClick={doBroadcast}>{t('rd.again')}</button>
+                </>
               ) : (
                 <>
                   {sentVia && <p class="small">{t(onChain === false && checked ? 'rd.notSeen' : 'rd.accepted', { source: sentVia })}</p>}
                   <button type="button" class="btn primary" disabled={busy} onClick={doBroadcast}>{t(sentVia ? 'rd.again' : 'rd.broadcast')}</button>
                 </>
               )}
-              {rawHex && !onChain && (
-                <div class="stack">
-                  <p class="small">{t('rd.manual')}</p>
-                  <button type="button" class="btn secondary" onClick={() => navigator.clipboard.writeText(rawHex).catch(() => undefined)}>{t('rd.copyTx')}</button>
-                  {apis.map(a => <a href={pushPageOf(a)} target="_blank" rel="noopener">{pushPageOf(a).replace(/^https?:\/\//, '')} ↗</a>)}
-                </div>
-              )}
+              {rawHex && (() => {
+                const manual = (
+                  <div class="stack">
+                    <p class="small">{t('rd.manual')}</p>
+                    <button type="button" class="btn secondary" onClick={() => navigator.clipboard.writeText(rawHex).catch(() => undefined)}>{t('rd.copyTx')}</button>
+                    {apis.map(a => <a href={pushPageOf(a)} target="_blank" rel="noopener">{pushPageOf(a).replace(/^https?:\/\//, '')} ↗</a>)}
+                  </div>
+                );
+                return onChain ? (
+                  <details>
+                    <summary>{t('rd.manualTitle')}</summary>
+                    {manual}
+                  </details>
+                ) : (
+                  manual
+                );
+              })()}
             </>
           )}
           {msg && <p class="warnbox">{msg}</p>}
