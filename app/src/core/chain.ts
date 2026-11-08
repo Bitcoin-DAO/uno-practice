@@ -57,8 +57,17 @@ const defaultFetch: Fetcher = async url => {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   try {
-    const r = await fetch(url, { signal: ctl.signal });
-    if (!r.ok) throw new Error(`${r.status} ${url}`);
+    let r: Response;
+    try {
+      r = await fetch(url, { signal: ctl.signal });
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') throw e;
+      // "Failed to fetch" covers both a server that is down and one that answers without letting web pages
+      // read the answer (no CORS header, often on a "too many requests" page). An opaque request tells them apart.
+      const reachable = await fetch(url, { mode: 'no-cors', signal: AbortSignal.timeout(10_000) }).then(() => true, () => false);
+      throw new Error(reachable ? 'answers, but does not let this site read it (CORS or too many requests)' : 'cannot be reached (Failed to fetch)');
+    }
+    if (!r.ok) throw new Error(r.status === 429 ? '429 too many requests' : `${r.status}`);
     return await r.json();
   } finally {
     clearTimeout(timer);
@@ -174,6 +183,7 @@ function inOrder(apis: string[]): string[] {
 async function get<T>(apis: string[], path: string, f: Fetcher, until = Infinity): Promise<T> {
   const live = f === defaultFetch;
   let last: unknown;
+  const why = new Map<string, string>(); // each source's latest failure, for the message
   for (let attempt = 0; attempt < (live ? 3 : 1); attempt++) {
     if (attempt > 0) await sleep(attempt === 1 ? 2000 : 5000);
     for (const api of inOrder(apis)) {
@@ -187,10 +197,13 @@ async function get<T>(apis: string[], path: string, f: Fetcher, until = Infinity
       } catch (e) {
         last = e;
         failedAt.set(api, Date.now());
+        why.set(api, e instanceof Error ? (e.name === 'AbortError' ? `no answer in ${TIMEOUT_MS / 1000} s` : e.message) : String(e));
       }
     }
   }
-  const msg = last instanceof Error ? (last.name === 'AbortError' ? `no answer in ${TIMEOUT_MS / 1000} s` : last.message) : 'no chain API';
+  const msg = why.size
+    ? [...why].map(([api, m]) => `${explorerOf(api).replace(/^https?:\/\//, '').split('/')[0]}: ${m}`).join(' · ')
+    : last instanceof Error ? last.message : 'no chain API';
   throw new Error(`${path.replace(/\/[0-9a-z]{20,}/gi, '/…')}: ${msg}`);
 }
 

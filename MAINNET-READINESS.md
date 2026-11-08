@@ -22,7 +22,7 @@
 - [x] Founding in person and remote, 2 of 2, short codes checked (UNO practice, v0.1.1–v0.1.5, 6 Nov 2026)
 - [ ] Remote founding with strangers, 3 of 5, through the group (Sandbox DAO)
 - [ ] Passkeys on iPhone (Safari) and Android (Chrome), and a passkey synced to a second device
-- [ ] Identity card printed, then used to restore on a new phone
+- [x] Identity card used to restore on a phone with its site data cleared: same identity, new passkey (UNO practice, @founder1, v0.1.7, 8 Nov 2026)
 - [ ] Sign-in on a phone that has never seen the DAO, from the site address only
 
 ## 2. Treasury reading
@@ -46,12 +46,12 @@
 
 ## 4. Membership
 
-- [ ] New member proposed, short code checked, voted in
-- [ ] Member leaves
+- [x] New member proposed, short code checked (two council checks), voted in, member list version 2 approved by the council: @member1 (UNO practice, v0.1.7, 8 Nov 2026)
+- [x] Member leaves: immediate, then member list version 5 approved by the council (@member1, UNO practice, v0.1.7, 8 Nov 2026)
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
-- [ ] Lost key: card restore, and key replacement when there is no card
-- [ ] Trial stages: a council member restores from the card, types the 12 words of the trial treasury key back in (v0.1.7), and signs a round
+- [x] Lost key: card restore (@founder1) and key replacement without the card, remote, twice in a row, with member list versions 3 and 4 (@member1, now VNTH · SY98) (UNO practice, v0.1.7, 8 Nov 2026)
+- [~] Trial stages: a council member restores from the card and types the 12 words of the trial treasury key back in; same fingerprint (8c37eb1f) (UNO practice, v0.1.7, 8 Nov 2026). Still to do: sign a round with it
 
 ## 5. Payout rounds
 
@@ -103,3 +103,16 @@ From UNO's practice run, 6 November 2026:
 9. A source answering that it already has the transaction counts as accepted, not as an error.
 10. Any viewer's round page reads the chain: once the transaction confirms, it shows "Confirmed on chain, receipt waiting for a council member" until a council phone publishes the receipt. Receipts are published only by a council member's open app, so they can lag behind the chain.
 11. Rules page: show short voting periods in minutes or hours ("10 minutes", not "0.007 days").
+12. Stop browser translation: the page starts marked as Italian, so Chrome offers to translate it, and translated "UNO" as "A". Mark the page `translate="no"` (the app has its own EN · IT switch) and set the starting language from the visitor's choice before the first paint.
+13. After a card restore, the header still shows "Sign in" until the next page; it should show the member's name at once.
+14. A page for council members, opened while signed out, says only "This page is for council members"; it should offer Sign in and Come back with your card.
+15. Replacing a council member's key needs approvals from other council members up to the threshold. When the threshold equals the council size (UNO practice's 2 of 2), it can never be reached, because the member who lost their key cannot approve. The Replace page should say so before anyone starts, instead of leaving a replacement waiting for ever.
+16. Founding setup: warn when the threshold equals the council size. One lost key then blocks both the treasury and key replacements. Recommend at least one spare (3 of 5, 2 of 3).
+17. Printing the identity card gives a blank second page and the browser's own header and footer (URL, date): the print style hides the rest of the page but keeps its space. Remove it from the print layout and set page margins so only the card prints, on one page.
+18. The candidate page says "in person: 1 check · on a video call: 2", and the welcome page "You join in person or on a video call", while the council chooses "remote", and remote joining needs no call. Use the same words everywhere.
+19. After a browser's site data is cleared, its passkeys still appear (they live in the Google or Apple account) but open nothing, and the message asks "Did you pick the right passkey?". Say instead that this browser no longer has the key the passkey protects, and point to the card or "I lost my key and card". Name passkeys so old and new ones can be told apart.
+20. Key replacement: once the council has approved and checked the new key, the new key still waits for the next member list version, and the member's page shows only "On the member list: Not yet". Say what it is waiting for ("the council publishes the new member list"). A member who taps Sign in meanwhile gets a passkey error, because the passkey is only made at the end; Sign in should take someone with a replacement under way back to its waiting page.
+21. Two council members can each start a replacement for the same new key. Once one takes effect, the other can never complete (the key is already in use), yet it stays on every council member's Council page as "Approve", and counts in the to-do badge, for ever. Hide replacements whose new key is already in effect, or whose old key is no longer the member's, and stop a second replacement for a key that already has one under way.
+22. After leaving, the profile still offers member actions (Propose a new member, payout address, Print the card). Show only what a former member can do: the record, and joining again. Confirmations use the browser's own dialog ("The page at https://bitcoin-dao.github.io says"); use the app's own, in its language.
+23. Payout proposals: a **Share** button for the recipient's confirmation link, next to "Copy the confirmation link", like the founder code's Share. The message names the DAO, the proposal number and title, and the amount, then the link, so the recipient knows what they are confirming before opening it. Copy stays where sharing is not available.
+24. When the chain cannot be read, the error shows only the last failure ("/address/…: Failed to fetch"), so nobody can tell whether one source or all of them failed, or why. List each source with its own reason (done in v0.1.8). Also cut the load: several open pages each read the treasury every few minutes and every "Try again" starts a new reading of about 15 requests, which can get a public source to throttle the DAO. Share one reading between open pages, and wait before a manual retry.

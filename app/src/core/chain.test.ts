@@ -73,6 +73,16 @@ describe('chain sources', () => {
     expect(tr.balance).toBe(10000);
   });
 
+  it('names every source and its own reason when none answers', async () => {
+    const f: Fetcher = async url => {
+      if (url.startsWith('https://esplora.example')) throw new Error('cannot be reached (Failed to fetch)');
+      throw new Error('429 too many requests');
+    };
+    await expect(loadTreasury(d, 'testnet4', ['https://esplora.example/api', `blockbook:${BB}`], f)).rejects.toThrow(
+      /esplora\.example: cannot be reached \(Failed to fetch\) · blockbook\.example: 429 too many requests|blockbook\.example: 429 too many requests · esplora\.example: cannot be reached/,
+    );
+  });
+
   it('turns Blockbook fee estimates and transaction status into the app\'s terms', async () => {
     expect(await feeRate([`blockbook:${BB}`], blockbook)).toBe(2); // 0.00002 BTC/kvB = 2 sat/vB
     expect(await txStatus([`blockbook:${BB}`], TXID, blockbook)).toEqual({ confirmed: true, block_height: 159356 });

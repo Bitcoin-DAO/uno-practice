@@ -2,6 +2,18 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.1.8 · 8 November 2026
+
+Found in UNO's closing round: the treasury could not be read ("/address/…: Failed to fetch"), while Blockbook answered in the browser. The message gave only the last failure, so nobody could tell which source failed or why.
+
+**Chain errors name every source**
+- When no source answers, the message lists each one with its own reason, for example "mempool.space: no answer in 30 s · blockbook.tbtc.zelcore.io: answers, but does not let this site read it".
+- "Failed to fetch" is split in two: a source that cannot be reached, and one that answers but does not let web pages read the answer (no CORS header, often on a "too many requests" page).
+- A 429 answer says "too many requests".
+
+**Tests**
+- Unit test: two failing sources are both named, each with its reason.
+
 ## v0.1.7 · 7 November 2026
 
 Found before UNO's lost-key test: the identity card restores the identity key only, so a council member who restored from the card could vote but no longer sign rounds. In a 2-of-2 practice DAO that would have locked the treasury.
