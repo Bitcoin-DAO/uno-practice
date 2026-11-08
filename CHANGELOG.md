@@ -2,6 +2,21 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.1.9 · 8 November 2026
+
+Found in UNO's closing round: with mempool.space down, the app had no chain source it could read, although Zelcore's Blockbook was in sync throughout. It only refuses web pages.
+
+**New: the chain gateway** (`gateway/`, design in `docs/chain-gateway.md`)
+- A Cloudflare Worker per DAO, next to the relay, on the free plan. It reads the public chain services on the app's behalf and lets the DAO's site read the answers, so Zelcore's Blockbook becomes usable.
+- Asks its sources in order, reuses answers briefly so open pages share one reading, refuses other sites' pages, and limits requests per visitor.
+- Sends every broadcast to all its sources; "already known" counts as accepted.
+- Answers in Blockbook's and Esplora's formats, so the app needs no change: the DAO's `chainApi` lists the gateway first.
+- Holds no keys and cannot move coins.
+
+**Tests**
+- Gateway unit tests (15): reading, falling back, caching, "not found", allowed requests, origins, the limit, broadcasting to every source, transaction ids, redirects.
+- End-to-end: the full payout round with the app reading the mock chain only through the gateway (`CHAIN=gateway bash app/e2e/run.sh payouts`).
+
 ## v0.1.8 · 8 November 2026
 
 Found in UNO's closing round: the treasury could not be read ("/address/…: Failed to fetch"), while Blockbook answered in the browser. The message gave only the last failure, so nobody could tell which source failed or why.

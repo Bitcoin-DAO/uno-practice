@@ -1,0 +1,20 @@
+{
+  "name": "btc-dao-gateway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'bundled by wrangler'",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20250109.0",
+    "typescript": "5.6.3",
+    "vitest": "2.1.9",
+    "wrangler": "3.99.0",
+    "@scure/btc-signer": "1.8.1",
+    "@noble/curves": "1.9.7"
+  }
+}

@@ -1,7 +1,9 @@
 #!/bin/bash
 # End-to-end tests: a local relay (relay/ under wrangler), a mock chain API, the built app, Playwright.
 # Needs: npm install in app/ and relay/, Playwright with Chromium, ffmpeg (camera test).
-# Usage: bash e2e/run.sh [founding|governance|payouts|all]   (CHAIN=blockbook: the mock chain answers as Blockbook only)
+# Usage: bash e2e/run.sh [founding|governance|payouts|all]
+#   CHAIN=blockbook: the mock chain answers as Blockbook only
+#   CHAIN=gateway: the app reads the mock chain only through the chain gateway (gateway/ under wrangler)
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 APP="$HERE/.."
@@ -12,7 +14,8 @@ mkdir -p "$OUT"
 node -e '
 const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
 Object.assign(c, { site: "http://localhost:4173", passkeyDomain: "localhost", relays: ["ws://127.0.0.1:8787"],
-  chainApi: process.env.CHAIN === "blockbook" ? ["blockbook:http://127.0.0.1:3002/bb"] : ["http://127.0.0.1:3002/api"] });
+  chainApi: process.env.CHAIN === "blockbook" ? ["blockbook:http://127.0.0.1:3002/bb"]
+    : process.env.CHAIN === "gateway" ? ["blockbook:http://127.0.0.1:8799/bb"] : ["http://127.0.0.1:3002/api"] });
 c.rules.votingPeriodDays = 0.0015; // about 2 minutes
 require("fs").writeFileSync(process.argv[2], JSON.stringify(c, null, 2));
 ' "$APP/../config/example.testnet4.json" "$OUT/dao.test.json"
@@ -25,6 +28,12 @@ start_relay() {
   (cd "$RELAY" && rm -rf .wrangler && npx wrangler dev --local --port 8787 > "$OUT/relay.log" 2>&1) &
   for i in $(seq 1 60); do curl -s -o /dev/null http://127.0.0.1:8787/ && return; sleep 1; done
   echo "relay did not start"; exit 1
+}
+start_gateway() {
+  [ "$CHAIN" = gateway ] || return 0
+  (cd "$APP/../gateway" && npx wrangler dev --local --port 8799 --var BLOCKBOOK:http://127.0.0.1:3002/bb --var ESPLORA:http://127.0.0.1:3002/api --var RATE_PER_MIN:100000 > "$OUT/gateway.log" 2>&1) &
+  for i in $(seq 1 60); do curl -s -o /dev/null http://127.0.0.1:8799/status && return; sleep 1; done
+  echo "gateway did not start"; exit 1
 }
 cleanup() { kill_matching "workerd|node .*wrangler|vite preview|esplora-mock"; }
 trap cleanup EXIT
@@ -47,5 +56,6 @@ if [ "$WHICH" = all ] || [ "$WHICH" = payouts ]; then
   kill_matching "esplora-mock"
   node "$HERE/esplora-mock.mjs" > "$OUT/esplora.log" 2>&1 &
   sleep 1
+  start_gateway
   node "$HERE/payouts.e2e.cjs"
 fi

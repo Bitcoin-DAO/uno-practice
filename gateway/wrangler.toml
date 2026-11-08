@@ -1,0 +1,14 @@
+# The DAO's chain gateway (docs/chain-gateway.md). Free Workers plan; no database, no secrets.
+name = "btc-dao-gateway"
+main = "src/index.ts"
+compatibility_date = "2025-01-04"
+
+[vars]
+# Sites whose pages may read the gateway (scheme and host only; localhost is always allowed).
+ALLOWED_ORIGINS = "https://bitcoin-dao.github.io"
+# Sources behind the gateway, asked in order. Blockbook servers, comma-separated:
+BLOCKBOOK = "https://blockbook.tbtc.zelcore.io"
+# Esplora APIs, comma-separated:
+ESPLORA = "https://mempool.space/testnet4/api,https://testnetscan.com/btc-testnet4/api"
+# Requests per visitor per minute.
+RATE_PER_MIN = "120"

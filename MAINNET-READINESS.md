@@ -28,8 +28,8 @@
 ## 2. Treasury reading
 
 - [x] Balance, movements and funding address read through an unstable indexer, with the remembered reading shown (UNO practice, v0.1.4)
-- [x] Second chain source used when the first fails (Blockbook, UNO practice, v0.1.5)
-- [ ] Our own indexer as a chain source (needed before mainnet)
+- [ ] Second chain source used when the first fails. Not proven: Zelcore's Blockbook refuses reads from web pages (CORS), shown by v0.1.8 on 8 Nov 2026, so on 6 Nov mempool.space most likely did all the work. Works in the end-to-end tests against a mock
+- [ ] The DAO's own chain gateway as the first chain source (design: `docs/chain-gateway.md`; provider behind it now, own node optional later)
 - [ ] Change returned by a round is shown and spent in the next round
 - [ ] Treasury read with many movements (10 or more)
 
@@ -116,3 +116,4 @@ From UNO's practice run, 6 November 2026:
 22. After leaving, the profile still offers member actions (Propose a new member, payout address, Print the card). Show only what a former member can do: the record, and joining again. Confirmations use the browser's own dialog ("The page at https://bitcoin-dao.github.io says"); use the app's own, in its language.
 23. Payout proposals: a **Share** button for the recipient's confirmation link, next to "Copy the confirmation link", like the founder code's Share. The message names the DAO, the proposal number and title, and the amount, then the link, so the recipient knows what they are confirming before opening it. Copy stays where sharing is not available.
 24. When the chain cannot be read, the error shows only the last failure ("/address/…: Failed to fetch"), so nobody can tell whether one source or all of them failed, or why. List each source with its own reason (done in v0.1.8). Also cut the load: several open pages each read the treasury every few minutes and every "Try again" starts a new reading of about 15 requests, which can get a public source to throttle the DAO. Share one reading between open pages, and wait before a manual retry.
+25. Zelcore's testnet4 Blockbook does not let web pages read its API (no CORS header), so the app can use it only as the manual broadcast page. With mempool.space down, UNO's closing round could not be prepared (8 Nov 2026). Before mainnet: our own indexer, served with CORS for the DAO's site, as the first source; any public source checked from a web page before it goes into a config. Consider a separate config entry for broadcast pages, so a source that cannot be read is not asked on every reading.
