@@ -1,3 +1,5 @@
+> **Closed on 8 November 2026.** UNO's practice run is complete (founding to closing, all test coins returned): see `docs/runs/2026-11-uno-practice.md` in btc-dao. UNO continues as **UNO DAO** at https://bitcoin-dao.github.io/uno-testnet, which covers practice and live votes in one site. This repository is kept as a record.
+
 # UNO · practice
 
 **This is UNO's practice copy of [btc-dao](https://github.com/Bitcoin-DAO/btc-dao)** (stage 1 of 3: practice, testnet, mainnet). It runs btc-dao v0.1.10 (commit 044d716) on testnet4 with votes of about ten minutes, so a few people can rehearse the whole life of the DAO in one sitting: founding, joining, voting, a lost key, restoring from a card and a payout round. Everything here is thrown away afterwards; the testnet stage is [`uno-testnet`](https://github.com/Bitcoin-DAO/uno-testnet).
